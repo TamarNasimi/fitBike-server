@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map with Route</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Create map and set initial view
+        const map = L.map('map').setView([32.0513135, 34.9466072], 13);
+
+        // Add OpenStreetMap base layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Load route data from JSON
+        fetch('route_stops.json')
+            .then(response => response.json())
+            .then(data => {
+                if (!Array.isArray(data.path)) {
+                    throw new Error('Invalid route data');
+                }
+
+                // Add markers for start, stops, and end points
+                const start = data.start.split(',').map(Number);
+                const end = data.end.split(',').map(Number);
+                const stops = data.stops.map(stop => stop.split(',').map(Number));
+
+                L.marker(start).addTo(map).bindPopup("Start").openPopup();
+                stops.forEach((stop, index) => {
+                    L.marker(stop).addTo(map).bindPopup(`Stop ${index + 1}`);
+                });
+                L.marker(end).addTo(map).bindPopup("End");
+
+                // Add polyline to map
+                const pathCoordinates = data.path.map(coord => {
+                    const [lat, lng] = coord.split(',').map(Number);
+                    return [lat, lng];
+                });
+
+                const polyline = L.polyline(pathCoordinates, { color: 'blue' }).addTo(map);
+
+                // Fit map view to the route
+                map.fitBounds(polyline.getBounds());
+            })
+            .catch(error => {
+                console.error('Error loading or displaying route:', error);
+            });
+    </script>
+</body>
+</html>
