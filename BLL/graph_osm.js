@@ -5,7 +5,7 @@ const turf = require('@turf/turf');
 const nodesMap = {};
 
 
-const API_KEY = 'AIzaSyDrgROSK1fOjENGJqOw1e6MQuvw5q76iiU';
+const API_KEY = 'API_KEY';
 
 // מהירות ממוצעת של רכיבה באופניים (במטרים לשעה)
 const AVERAGE_CYCLING_SPEED = 15000; // 15 קמ"ש = 15000 מטר לשעה
